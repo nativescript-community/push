@@ -1,0 +1,81 @@
+/**
+ * iOS Utils file
+ */
+
+import { getClass } from '@nativescript/core/utils/types';
+
+// export function invokeOnRunLoop  (() => {
+//     const runloop = CFRunLoopGetMain();
+//     return (func) => {
+//         CFRunLoopPerformBlock(runloop, kCFRunLoopDefaultMode, func);
+//         CFRunLoopWakeUp(runloop);
+//     };
+// })();
+
+const runloop = CFRunLoopGetMain();
+export function invokeOnRunLoop(func) {
+    CFRunLoopPerformBlock(runloop, kCFRunLoopDefaultMode, func);
+    CFRunLoopWakeUp(runloop);
+}
+
+export function toJsObject(objCObj) {
+    if (objCObj === null || typeof objCObj !== 'object') {
+        return objCObj;
+    }
+    let node, key, i, l;
+    const oKeyArr = objCObj.allKeys;
+
+    if (oKeyArr === undefined && objCObj.count !== undefined) {
+        // array
+        node = [];
+        for (i = 0, l = objCObj.count; i < l; i++) {
+            key = objCObj.objectAtIndex(i);
+            node.push(this.toJsObject(key));
+        }
+    } else if (oKeyArr !== undefined) {
+        // object
+        node = {};
+        for (i = 0, l = oKeyArr.count; i < l; i++) {
+            key = oKeyArr.objectAtIndex(i);
+            const val = objCObj.valueForKey(key);
+
+            // Firestore can store nulls
+            if (val === null) {
+                node[key] = null;
+                continue;
+            }
+            node[key] = this.getValueForClass(val);
+        }
+    } else {
+        node = this.getValueForClass(objCObj);
+    }
+
+    return node;
+}
+
+// function getValueForClass(val) {
+//     switch (getClass(val)) {
+//         case 'NSArray':
+//         case 'NSMutableArray':
+//             return this.toJsObject(val);
+//         case 'NSDictionary':
+//         case 'NSMutableDictionary':
+//             return this.toJsObject(val);
+//         case 'String':
+//             return String(val);
+//         case 'Boolean':
+//             return val;
+//         case 'Number':
+//         case 'NSDecimalNumber':
+//             return Number(String(val));
+//         case 'Date':
+//             return new Date(val);
+//         default:
+//             console.log(
+//                 "Please report this at https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues: iOS toJsObject is missing a converter for class '" +
+//                     getClass(val) +
+//                     "'. Casting to String as a fallback."
+//             );
+//             return String(val);
+//     }
+// }

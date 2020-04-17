@@ -1,0 +1,71 @@
+{
+    "name": "nativescript-push",
+    "version": "1.0.0",
+    "description": "Very simple push notification plugin",
+    "main": "./label",
+    "typings": "./label.d.ts",
+    "nativescript": {
+        "platforms": {
+            "android": "3.0.0",
+            "ios": "3.0.0"
+        }
+    },
+    "scripts": {
+        "tsc": "cpy '**/*.d.ts' '../plugin' --parents --cwd=src && tsc -skipLibCheck",
+        "clean": "rimraf ./plugin/**/*.d.ts ./plugin/**/*.js ./plugin/**/*.js.map plugin/node_modules plugin/package-lock.json",
+        "build.plugin": "npm run tsc && cp README.md plugin/",
+        "build.android": "bash src-native/android/build.sh",
+        "build.ios": "bash src-native/ios/build.sh",
+        "build.native": "npm run build.android && npm run build.ios",
+        "build": "npm run build.plugin",
+        "publish": "npm run build && lerna publish",
+        "demo.ios": "npm i && npm run tsc && cd demo && tns run ios",
+        "demo.android": "npm i && npm run tsc && cd demo && tns run android",
+        "clean.demo": "rimraf demo/hooks demo/node_modules demo/platforms",
+        "plugin.watch.tsc": "npm run tsc -- -w",
+        "plugin.watch.android": "npm i && npm-watch build.android",
+        "plugin.watch.ios": "npm i && npm-watch build.ios",
+        "plugin.watch": "npm run plugin.watch.tsc & npm run plugin.watch.android & npm run plugin.watch.ios",
+        "commitmsg": "commitlint -e $GIT_PARAMS"
+    },
+    "keywords": [
+        "NativeScript",
+        "JavaScript",
+        "Android",
+        "iOS"
+    ],
+    "author": {
+        "name": "Martin Guillon",
+        "email": "martin@akylas.fr"
+    },
+    "bugs": {
+        "url": "https://github.com/farfromrefug/nativescript-push/issues"
+    },
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/farfromrefug/nativescript-push",
+    "readmeFilename": "README.md",
+    "devDependencies": {
+        "@commitlint/cli": "^8.3.5",
+        "@commitlint/config-conventional": "^8.3.4",
+        "@nativescript/core": "6.5.1",
+        "@types/node": "^13.7.1",
+        "@typescript-eslint/eslint-plugin": "2.28.0",
+        "@typescript-eslint/parser": "2.28.0",
+        "cpy-cli": "^3.1.0",
+        "eslint": "6.8.0",
+        "husky": "^4.2.5",
+        "lerna": "^3.20.2",
+        "nativescript-shared-notification-delegate": "^1.0.0",
+        "npm-watch": "^0.6.0",
+        "prompt": "^1.0.0",
+        "rimraf": "^3.0.2",
+        "tns-platform-declarations": "^6.5.1",
+        "typescript": "~3.8.3"
+    },
+    "bootstrapper": "nativescript-plugin-seed",
+    "commitlint": {
+        "extends": [
+            "@commitlint/config-conventional"
+        ]
+    }
+}
