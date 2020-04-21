@@ -12,7 +12,7 @@
         "hooks": [
             {
                 "type": "after-prepare",
-                "script": "hooks/after-prepare.js",
+                "script": "scripts/after-prepare.js",
                 "inject": true
             }
         ]
