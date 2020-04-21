@@ -34,18 +34,20 @@ function getSenderId(): Promise<string> {
     });
 }
 
-export function initFirebaseMessaging(options?: MessagingOptions) {
+async function initPushMessaging(options?: MessagingOptions) {
     if (!options) {
         return;
     }
+
     if (options.onMessageReceivedCallback !== undefined) {
-        addOnMessageReceivedCallback(options.onMessageReceivedCallback);
+        await addOnMessageReceivedCallback(options.onMessageReceivedCallback);
     }
     if (options.onPushTokenReceivedCallback !== undefined) {
         console.log('addOnPushTokenReceivedCallback');
-        addOnPushTokenReceivedCallback(options.onPushTokenReceivedCallback);
+        await addOnPushTokenReceivedCallback(options.onPushTokenReceivedCallback);
     }
 }
+export function init() {}
 
 export function onAppModuleLaunchEvent(args: any) {
     com.nativescript.push.FirebasePluginLifecycleCallbacks.registerCallbacks(application.android.nativeApp);
@@ -91,20 +93,7 @@ export function registerForInteractivePush(model?: PushNotificationModel): void 
 export function getCurrentPushToken(): Promise<string> {
     return new Promise((resolve, reject) => {
         try {
-            if (typeof (com.google.firebase.messaging || com.google.firebase.iid) === 'undefined') {
-                reject("Uncomment firebase-messaging in the plugin's include.gradle first");
-                return;
-            }
-
-            getSenderId().then((senderId) => {
-                com.nativescript.push.FirebasePlugin.getCurrentPushToken(
-                    senderId,
-                    new com.nativescript.push.FirebasePluginListener({
-                        success: (token) => resolve(token),
-                        error: (err) => reject(err),
-                    })
-                );
-            });
+            resolve(com.nativescript.push.FirebasePlugin.getCurrentPushToken());
         } catch (ex) {
             console.log('Error in messaging.getCurrentPushToken: ' + ex);
             reject(ex);
@@ -113,7 +102,7 @@ export function getCurrentPushToken(): Promise<string> {
 }
 
 let _receivedNotificationCallback;
-export function addOnMessageReceivedCallback(callback) {
+function addOnMessageReceivedCallback(callback) {
     return new Promise((resolve, reject) => {
         try {
             _receivedNotificationCallback = callback;
@@ -139,7 +128,7 @@ export function addOnMessageReceivedCallback(callback) {
     });
 }
 
-export function addOnPushTokenReceivedCallback(callback) {
+function addOnPushTokenReceivedCallback(callback) {
     return new Promise((resolve, reject) => {
         try {
             let tokenReturned = false;
@@ -154,19 +143,19 @@ export function addOnPushTokenReceivedCallback(callback) {
             );
 
             // make sure we return a token if we already have it
-            setTimeout(() => {
-                if (!tokenReturned) {
-                    getSenderId().then((senderId) => {
-                        com.nativescript.push.FirebasePlugin.getCurrentPushToken(
-                            senderId,
-                            new com.nativescript.push.FirebasePluginListener({
-                                success: (token) => callback(token),
-                                error: (err) => console.log(err),
-                            })
-                        );
-                    });
-                }
-            }, 2000);
+            // setTimeout(() => {
+            //     if (!tokenReturned) {
+            //         getSenderId().then((senderId) => {
+            //             com.nativescript.push.FirebasePlugin.getCurrentPushToken(
+            //                 senderId,
+            //                 new com.nativescript.push.FirebasePluginListener({
+            //                     success: (token) => callback(token),
+            //                     error: (err) => console.log(err),
+            //                 })
+            //             );
+            //         });
+            //     }
+            // }, 2000);
 
             resolve();
         } catch (ex) {
@@ -176,29 +165,31 @@ export function addOnPushTokenReceivedCallback(callback) {
     });
 }
 
-export function registerForPushNotifications(options?: MessagingOptions): Promise<void> {
+export async function registerForPushNotifications(options?: MessagingOptions): Promise<void> {
+    // return new Promise((resolve, reject) => {
+    // try {
+    await initPushMessaging(options);
+
     return new Promise((resolve, reject) => {
-        try {
-            if (typeof com.google.firebase.messaging === 'undefined') {
-                reject("Uncomment firebase-messaging in the plugin's include.gradle first");
-                return;
-            }
-
-            initFirebaseMessaging(options);
-            console.log('initFirebaseMessaging');
-
-            getSenderId()
-                .then((senderId) => {
-                    console.log('senderId', senderId);
-                    com.nativescript.push.FirebasePlugin.registerForPushNotifications(senderId);
-                    resolve();
-                })
-                .catch((e) => reject(e));
-        } catch (ex) {
-            console.log('Error in messaging.registerForPushNotifications: ' + ex);
-            reject(ex);
-        }
+        com.nativescript.push.FirebasePlugin.registerForPushNotifications(
+            new com.nativescript.push.FirebasePluginListener({
+                success: (token) => resolve(token),
+                error: (err) => reject(err),
+            })
+        );
     });
+
+    // getSenderId()
+    //     .then((senderId) => {
+    //         com.nativescript.push.FirebasePlugin.registerForPushNotifications(senderId);
+    //         resolve();
+    //     })
+    //     .catch((e) => reject(e));
+    // } catch (ex) {
+    //     console.log('Error in messaging.registerForPushNotifications: ' + ex);
+    //     reject(ex);
+    // }
+    // });
 }
 
 export function unregisterForPushNotifications(): Promise<void> {

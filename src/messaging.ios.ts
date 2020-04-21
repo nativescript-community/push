@@ -18,7 +18,7 @@ let _pushToken: any;
 let _receivedPushTokenCallback: Function;
 let _receivedNotificationCallback: Function;
 let _registerForRemoteNotificationsRanThisSession = false;
-let _userNotificationCenterDelegateObserver: FirebaseNotificationDelegateObserverImpl;
+let _userNotificationCenterDelegateObserver: PushNotificationDelegateObserverImpl;
 let _showNotifications: boolean = true;
 let _showNotificationsWhenInForeground: boolean = false;
 let _autoClearBadge: boolean = true;
@@ -28,9 +28,9 @@ let _rejectWhenDidFailToRegisterForNotifications;
 
 // Track whether or not registration for remote notifications was request.
 // This way we can suppress the "Allow notifications" consent popup until the listeners are passed in.
-const NOTIFICATIONS_REGISTRATION_KEY = 'Firebase-RegisterForRemoteNotifications';
+// const NOTIFICATIONS_REGISTRATION_KEY = 'Push-RegisterForRemoteNotifications';
 
-export function initFirebaseMessaging(options) {
+export function initPushMessaging(options) {
     if (!options) {
         return;
     }
@@ -53,11 +53,11 @@ export function initFirebaseMessaging(options) {
 export function addOnMessageReceivedCallback(callback: Function) {
     return new Promise((resolve, reject) => {
         try {
-            applicationSettings.setBoolean(NOTIFICATIONS_REGISTRATION_KEY, true);
+            // applicationSettings.setBoolean(NOTIFICATIONS_REGISTRATION_KEY, true);
 
             _receivedNotificationCallback = callback;
-            _registerForRemoteNotifications(resolve, reject);
-            _processPendingNotifications();
+            // _registerForRemoteNotifications(resolve, reject);
+            // _processPendingNotifications();
 
             resolve();
         } catch (ex) {
@@ -81,7 +81,8 @@ export function getCurrentPushToken(): Promise<string> {
 export function registerForPushNotifications(options?: MessagingOptions): Promise<void> {
     return new Promise((resolve, reject) => {
         try {
-            initFirebaseMessaging(options);
+            console.log('registerForPushNotifications', options);
+            initPushMessaging(options);
             _registerForRemoteNotificationsRanThisSession = false;
             _registerForRemoteNotifications(resolve, reject);
         } catch (ex) {
@@ -130,19 +131,19 @@ export function handleRemoteNotification(app, userInfo) {
     }
 }
 
-export function addOnPushTokenReceivedCallback(callback) {
+function addOnPushTokenReceivedCallback(callback) {
     return new Promise((resolve, reject) => {
         try {
             _receivedPushTokenCallback = callback;
-
+            console.log('addOnPushTokenReceivedCallback', _pushToken, callback);
             // may already be present
             if (_pushToken) {
                 callback(_pushToken);
             }
 
-            applicationSettings.setBoolean(NOTIFICATIONS_REGISTRATION_KEY, true);
-            _registerForRemoteNotifications();
-            _processPendingNotifications();
+            // applicationSettings.setBoolean(NOTIFICATIONS_REGISTRATION_KEY, true);
+            // _registerForRemoteNotifications();
+            // _processPendingNotifications();
 
             resolve();
         } catch (ex) {
@@ -152,11 +153,49 @@ export function addOnPushTokenReceivedCallback(callback) {
     });
 }
 
-export function addBackgroundRemoteNotificationHandler(appDelegate) {
+// This breaks in-app-messaging :(
+function getAppDelegate() {
+    // Play nice with other plugins by not completely ignoring anything already added to the appdelegate
+    if (application.ios.delegate === undefined) {
+        @ObjCClass(UIApplicationDelegate)
+        class UIApplicationDelegateImpl extends UIResponder implements UIApplicationDelegate {}
+
+        application.ios.delegate = UIApplicationDelegateImpl;
+    }
+    return application.ios.delegate;
+}
+function addAppDelegateMethods(appDelegate) {
+    // we need the launchOptions for this one so it's a bit hard to use the UIApplicationDidFinishLaunchingNotification pattern we're using for other things
+    // however, let's not override 'applicationDidFinishLaunchingWithOptions' if we don't really need it:
+    console.log('addAppDelegateMethods');
+    const oldMethod = appDelegate.prototype.applicationDidFinishLaunchingWithOptions;
+    appDelegate.prototype.applicationDidFinishLaunchingWithOptions = function (application, launchOptions) {
+        if (oldMethod) {
+            oldMethod.call(this, application, launchOptions);
+        }
+        // If the app was terminated and iOS is launching it in result of a push notification tapped by the user, this will hold the notification data.
+        if (launchOptions) {
+            const remoteNotification = launchOptions.objectForKey(UIApplicationLaunchOptionsRemoteNotificationKey);
+            if (remoteNotification) {
+                handleRemoteNotification(application, remoteNotification);
+            }
+        }
+
+        return true;
+    };
+}
+
+function addBackgroundRemoteNotificationHandler(appDelegate) {
+    console.log('addBackgroundRemoteNotificationHandler');
+    const oldMethod = appDelegate.prototype.applicationDidRegisterForRemoteNotificationsWithDeviceToken;
     appDelegate.prototype.applicationDidRegisterForRemoteNotificationsWithDeviceToken = (
         application: UIApplication,
         deviceToken: NSData
     ) => {
+        if (oldMethod) {
+            oldMethod.call(this, application, deviceToken);
+        }
+        console.log('applicationDidRegisterForRemoteNotificationsWithDeviceToken', _receivedPushTokenCallback);
         if (areNotificationsEnabled()) {
             _resolveWhenDidRegisterForNotifications && _resolveWhenDidRegisterForNotifications();
         } else {
@@ -175,14 +214,14 @@ export function addBackgroundRemoteNotificationHandler(appDelegate) {
         application: UIApplication,
         error: NSError
     ) => {
-        if (error.localizedDescription.indexOf('not supported in the simulator') > -1) {
-            // Why? See https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues/1277
-            // Note that this method will also be invoked on a simulator when the consent popup is declined
-            _resolveWhenDidRegisterForNotifications && _resolveWhenDidRegisterForNotifications();
-        } else {
-            _rejectWhenDidFailToRegisterForNotifications &&
-                _rejectWhenDidFailToRegisterForNotifications(error.localizedDescription);
-        }
+        console.log('applicationDidFailToRegisterForRemoteNotificationsWithError', error);
+        // if (error.localizedDescription.indexOf('not supported in the simulator') > -1) {
+        //     // Why? See https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues/1277
+        //     // Note that this method will also be invoked on a simulator when the consent popup is declined
+        //     _resolveWhenDidRegisterForNotifications && _resolveWhenDidRegisterForNotifications();
+        // } else {
+        _rejectWhenDidFailToRegisterForNotifications && _rejectWhenDidFailToRegisterForNotifications(error.localizedDescription);
+        // }
     };
 
     appDelegate.prototype.applicationDidReceiveRemoteNotificationFetchCompletionHandler = (
@@ -195,6 +234,14 @@ export function addBackgroundRemoteNotificationHandler(appDelegate) {
         completionHandler(UIBackgroundFetchResult.NewData);
         handleRemoteNotification(app, notification);
     };
+}
+
+export function init() {
+    prepAppDelegate();
+    const delegate = getAppDelegate();
+    addAppDelegateMethods(delegate);
+    addBackgroundRemoteNotificationHandler(delegate);
+    // initPushMessaging(arg);
 }
 
 export function registerForInteractivePush(model?: PushNotificationModel): void {
@@ -250,15 +297,15 @@ export function registerForInteractivePush(model?: PushNotificationModel): void 
     }
 }
 
-export function prepAppDelegate() {
+function prepAppDelegate() {
     // see https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues/178 for why we're not using a constant here
-    _addObserver('com.firebase.iid.notif.refresh-token', (notification) => onTokenRefreshNotification(notification.object));
+    // _addObserver('com.firebase.iid.notif.refresh-token', (notification) => onTokenRefreshNotification(notification.object));
 
-    _addObserver(UIApplicationDidFinishLaunchingNotification, (appNotification) => {
-        if (applicationSettings.getBoolean(NOTIFICATIONS_REGISTRATION_KEY, false)) {
-            _registerForRemoteNotifications();
-        }
-    });
+    // _addObserver(UIApplicationDidFinishLaunchingNotification, (appNotification) => {
+    //     if (applicationSettings.getBoolean(NOTIFICATIONS_REGISTRATION_KEY, false)) {
+    //         _registerForRemoteNotifications();
+    //     }
+    // });
 
     _addObserver(UIApplicationDidBecomeActiveNotification, (appNotification) => {
         _processPendingNotifications();
@@ -276,8 +323,7 @@ export function unsubscribeFromTopic(topicName) {
         reject('Enable FIRMessaging in Podfile first');
     });
 }
-
-export const onTokenRefreshNotification = (token) => {
+const onTokenRefreshNotification = (token) => {
     _pushToken = token;
 
     if (_receivedPushTokenCallback) {
@@ -322,11 +368,17 @@ const updateUserInfo = (userInfoJSON) => {
 
 function _registerForRemoteNotifications(resolve?, reject?) {
     let app = UIApplication.sharedApplication;
+    console.log('_registerForRemoteNotifications', !!app);
     if (!app) {
         application.on('launch', () => _registerForRemoteNotifications(resolve, reject));
         return;
     }
-
+    function actualRegisterForRemoteNotifications() {
+        invokeOnRunLoop(() => {
+            // see https://developer.apple.com/documentation/uikit/uiapplication/1623078-registerforremotenotifications
+            app.registerForRemoteNotifications(); // prompts the user to accept notifications
+        });
+    }
     if (_registerForRemoteNotificationsRanThisSession) {
         resolve && resolve();
         return;
@@ -347,8 +399,7 @@ function _registerForRemoteNotifications(resolve?, reject?) {
                         app = UIApplication.sharedApplication;
                     }
                     if (app !== null) {
-                        // see https://developer.apple.com/documentation/uikit/uiapplication/1623078-registerforremotenotifications
-                        invokeOnRunLoop(() => app.registerForRemoteNotifications());
+                        actualRegisterForRemoteNotifications();
                     }
                 } else {
                     console.log('Error requesting push notification auth: ' + error);
@@ -358,7 +409,7 @@ function _registerForRemoteNotifications(resolve?, reject?) {
         );
 
         if (_showNotifications) {
-            _userNotificationCenterDelegateObserver = new FirebaseNotificationDelegateObserverImpl(
+            _userNotificationCenterDelegateObserver = new PushNotificationDelegateObserverImpl(
                 (unnotification, actionIdentifier?, inputText?) => {
                     // if the app is in the foreground then this method will receive the notification
                     // if the app is in the background, and user has responded to interactive notification, then this method will receive the notification
@@ -401,9 +452,7 @@ function _registerForRemoteNotifications(resolve?, reject?) {
             UIUserNotificationType.Sound |
             UIUserNotificationActivationMode.Background;
         const notificationSettings = UIUserNotificationSettings.settingsForTypesCategories(notificationTypes, null);
-        invokeOnRunLoop(() => {
-            app.registerForRemoteNotifications(); // prompts the user to accept notifications
-        });
+        actualRegisterForRemoteNotifications();
         app.registerUserNotificationSettings(notificationSettings);
     }
 }
@@ -470,8 +519,8 @@ function _addObserver(eventName, callback) {
     );
 }
 
-class FirebaseNotificationDelegateObserverImpl implements DelegateObserver {
-    observerUniqueKey = 'firebase-messaging';
+class PushNotificationDelegateObserverImpl implements DelegateObserver {
+    observerUniqueKey = 'psuh-messaging';
 
     private callback: (unnotification: UNNotification, actionIdentifier?: string, inputText?: string) => void;
 

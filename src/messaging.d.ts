@@ -59,25 +59,14 @@ export interface MessagingOptions {
     autoClearBadge?: boolean;
 }
 
-export declare function initFirebaseMessaging(options?: MessagingOptions): void;
-
-export declare function addOnMessageReceivedCallback(callback: (message: Message) => void): Promise<{}>;
-
+export declare function init();
 export declare function getCurrentPushToken(): Promise<string>;
 
 export declare function registerForPushNotifications(options?: MessagingOptions): Promise<void>;
 
 export declare function unregisterForPushNotifications(): Promise<void>;
 
-export declare function handleRemoteNotification(app: any, userInfo: any): void;
-
-export declare function addOnPushTokenReceivedCallback(callback: (token: string) => void): Promise<{}>;
-
-export declare function addBackgroundRemoteNotificationHandler(appDelegate: any): void;
-
 export declare function registerForInteractivePush(model?: any): void;
-
-export declare function prepAppDelegate(): void;
 
 export declare function subscribeToTopic(topicName: any): Promise<{}>;
 
