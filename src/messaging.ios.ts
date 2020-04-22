@@ -544,7 +544,6 @@ class PushNotificationDelegateObserverImpl implements DelegateObserver {
 
         if (
             _showNotificationsWhenInForeground || // Default value, in case we always want to show when in foreground.
-            userInfoJSON['gcm.notification.showWhenInForeground'] === 'true' || // This is for FCM, ...
             userInfoJSON['showWhenInForeground'] === true || // ...this is for non-FCM...
             (userInfoJSON.aps && userInfoJSON.aps.showWhenInForeground === true) // ...and this as well (so users can choose where to put it).
         ) {
