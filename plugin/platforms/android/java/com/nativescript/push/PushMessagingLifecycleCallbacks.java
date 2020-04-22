@@ -12,10 +12,10 @@ import android.util.Log;
  * Center, otherwise they're passed directly to the application by invoking the
  * onMessageReceived callback.
  */
-public class FirebasePluginLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
+public class PushMessagingLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
   static final String TAG = "FirebasePluginCB";
 
-  private static FirebasePluginLifecycleCallbacks callbacks = new FirebasePluginLifecycleCallbacks();
+  private static PushMessagingLifecycleCallbacks callbacks = new PushMessagingLifecycleCallbacks();
 
   /**
    * Register for the application's events
@@ -37,19 +37,19 @@ public class FirebasePluginLifecycleCallbacks implements Application.ActivityLif
   }
 
   public void onActivityPaused(Activity activity) {
-    Log.d(MyFirebaseMessagingService.TAG, "onActivityPaused: Application has been stopped.");
+    Log.d(PushMessagingService.TAG, "onActivityPaused: Application has been stopped.");
 
     // the application is being stopped -> the push plugin is not in
     // active/foreground state anymore
-    MyFirebaseMessagingService.isActive = false;
+    PushMessagingService.isActive = false;
   }
 
   public void onActivityResumed(Activity activity) {
-    Log.d(MyFirebaseMessagingService.TAG, "onActivityResumed: Application has been started");
+    Log.d(PushMessagingService.TAG, "onActivityResumed: Application has been started");
 
     // the application has been resumed-> the push plugin is now in
     // active/foreground state
-    MyFirebaseMessagingService.isActive = true;
+    PushMessagingService.isActive = true;
   }
 
   public void onActivityCreated(Activity activity, Bundle bundle) {
