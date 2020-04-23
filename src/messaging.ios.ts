@@ -81,7 +81,6 @@ export function getCurrentPushToken(): Promise<string> {
 export function registerForPushNotifications(options?: MessagingOptions): Promise<void> {
     return new Promise((resolve, reject) => {
         try {
-            console.log('registerForPushNotifications', options);
             initPushMessaging(options);
             _registerForRemoteNotificationsRanThisSession = false;
             _registerForRemoteNotifications(resolve, reject);
@@ -135,7 +134,6 @@ function addOnPushTokenReceivedCallback(callback) {
     return new Promise((resolve, reject) => {
         try {
             _receivedPushTokenCallback = callback;
-            console.log('addOnPushTokenReceivedCallback', _pushToken, callback);
             // may already be present
             if (_pushToken) {
                 callback(_pushToken);
@@ -167,7 +165,6 @@ function getAppDelegate() {
 function addAppDelegateMethods(appDelegate) {
     // we need the launchOptions for this one so it's a bit hard to use the UIApplicationDidFinishLaunchingNotification pattern we're using for other things
     // however, let's not override 'applicationDidFinishLaunchingWithOptions' if we don't really need it:
-    console.log('addAppDelegateMethods');
     const oldMethod = appDelegate.prototype.applicationDidFinishLaunchingWithOptions;
     appDelegate.prototype.applicationDidFinishLaunchingWithOptions = function (application, launchOptions) {
         if (oldMethod) {
@@ -186,7 +183,6 @@ function addAppDelegateMethods(appDelegate) {
 }
 
 function addBackgroundRemoteNotificationHandler(appDelegate) {
-    console.log('addBackgroundRemoteNotificationHandler');
     const oldMethod = appDelegate.prototype.applicationDidRegisterForRemoteNotificationsWithDeviceToken;
     appDelegate.prototype.applicationDidRegisterForRemoteNotificationsWithDeviceToken = (
         application: UIApplication,
@@ -195,7 +191,6 @@ function addBackgroundRemoteNotificationHandler(appDelegate) {
         if (oldMethod) {
             oldMethod.call(this, application, deviceToken);
         }
-        console.log('applicationDidRegisterForRemoteNotificationsWithDeviceToken', _receivedPushTokenCallback);
         if (areNotificationsEnabled()) {
             _resolveWhenDidRegisterForNotifications && _resolveWhenDidRegisterForNotifications();
         } else {
@@ -214,7 +209,7 @@ function addBackgroundRemoteNotificationHandler(appDelegate) {
         application: UIApplication,
         error: NSError
     ) => {
-        console.log('applicationDidFailToRegisterForRemoteNotificationsWithError', error);
+        console.error('applicationDidFailToRegisterForRemoteNotificationsWithError', error);
         // if (error.localizedDescription.indexOf('not supported in the simulator') > -1) {
         //     // Why? See https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues/1277
         //     // Note that this method will also be invoked on a simulator when the consent popup is declined
@@ -368,7 +363,6 @@ const updateUserInfo = (userInfoJSON) => {
 
 function _registerForRemoteNotifications(resolve?, reject?) {
     let app = UIApplication.sharedApplication;
-    console.log('_registerForRemoteNotifications', !!app);
     if (!app) {
         application.on('launch', () => _registerForRemoteNotifications(resolve, reject));
         return;

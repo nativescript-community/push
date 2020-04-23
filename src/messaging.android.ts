@@ -95,7 +95,7 @@ export function onAppModuleResumeEvent(args: any) {
 }
 
 export function registerForInteractivePush(model?: PushNotificationModel): void {
-    console.log("'registerForInteractivePush' is not currently implemented on Android");
+    console.error("'registerForInteractivePush' is not currently implemented on Android");
 }
 
 export function getCurrentPushToken(): Promise<string> {
