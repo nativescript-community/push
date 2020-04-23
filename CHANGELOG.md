@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.7](https://github.com/farfromrefug/nativescript-push/compare/v1.0.6...v1.0.7) (2020-04-23)
+
+
+### Bug Fixes
+
+* clean logs ([b395638](https://github.com/farfromrefug/nativescript-push/commit/b3956387da30076ff024f35583f8f4ee3893d220))
+
+
+
+
+
 ## [1.0.6](https://github.com/farfromrefug/nativescript-push/compare/v1.0.5...v1.0.6) (2020-04-22)
 
 
