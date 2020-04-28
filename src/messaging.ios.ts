@@ -542,8 +542,6 @@ class PushNotificationDelegateObserverImpl extends NSObject {
         const userInfo = notification.request.content.userInfo;
         const userInfoJSON = toJsObject(userInfo);
         if (!(notification.request.trigger instanceof UNPushNotificationTrigger)) {
-            // not a firebase message!
-            // next();
             return;
         }
         if (
@@ -569,10 +567,7 @@ class PushNotificationDelegateObserverImpl extends NSObject {
         response: UNNotificationResponse,
         completionHandler: () => void
     ): void {
-        
         if (!(response.notification.request.trigger instanceof UNPushNotificationTrigger)) {
-            // not a firebase message!
-            // next();
             return;
         }
         // let's ignore "dismiss" actions
