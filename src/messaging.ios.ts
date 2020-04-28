@@ -361,6 +361,38 @@ const updateUserInfo = (userInfoJSON) => {
     userInfoJSON.aps = undefined;
 };
 
+function onCallback(unnotification, actionIdentifier?, inputText?) {
+    // if the app is in the foreground then this method will receive the notification
+    // if the app is in the background, and user has responded to interactive notification, then this method will receive the notification
+    // if the app is in the background, and user views a notification, applicationDidReceiveRemoteNotificationFetchCompletionHandler will receive it
+    const userInfo = unnotification.request.content.userInfo;
+    const userInfoJSON = toJsObject(userInfo);
+    updateUserInfo(userInfoJSON);
+
+    if (actionIdentifier) {
+        _pendingActionTakenNotifications.push({
+            actionIdentifier,
+            userInfoJSON,
+            inputText,
+        });
+
+        if (_notificationActionTakenCallback) {
+            _processPendingActionTakenNotifications();
+        }
+
+        userInfoJSON.notificationTapped = actionIdentifier === UNNotificationDefaultActionIdentifier;
+    } else {
+        userInfoJSON.notificationTapped = false;
+    }
+
+    userInfoJSON.foreground = UIApplication.sharedApplication.applicationState === UIApplicationState.Active;
+
+    _pendingNotifications.push(userInfoJSON);
+    if (_receivedNotificationCallback) {
+        _processPendingNotifications();
+    }
+}
+
 function _registerForRemoteNotifications(resolve?, reject?) {
     let app = UIApplication.sharedApplication;
     if (!app) {
@@ -403,41 +435,11 @@ function _registerForRemoteNotifications(resolve?, reject?) {
         );
 
         if (_showNotifications) {
-            _userNotificationCenterDelegateObserver = new PushNotificationDelegateObserverImpl(
-                (unnotification, actionIdentifier?, inputText?) => {
-                    // if the app is in the foreground then this method will receive the notification
-                    // if the app is in the background, and user has responded to interactive notification, then this method will receive the notification
-                    // if the app is in the background, and user views a notification, applicationDidReceiveRemoteNotificationFetchCompletionHandler will receive it
-                    const userInfo = unnotification.request.content.userInfo;
-                    const userInfoJSON = toJsObject(userInfo);
-                    updateUserInfo(userInfoJSON);
-
-                    if (actionIdentifier) {
-                        _pendingActionTakenNotifications.push({
-                            actionIdentifier,
-                            userInfoJSON,
-                            inputText,
-                        });
-
-                        if (_notificationActionTakenCallback) {
-                            _processPendingActionTakenNotifications();
-                        }
-
-                        userInfoJSON.notificationTapped = actionIdentifier === UNNotificationDefaultActionIdentifier;
-                    } else {
-                        userInfoJSON.notificationTapped = false;
-                    }
-
-                    userInfoJSON.foreground = UIApplication.sharedApplication.applicationState === UIApplicationState.Active;
-
-                    _pendingNotifications.push(userInfoJSON);
-                    if (_receivedNotificationCallback) {
-                        _processPendingNotifications();
-                    }
-                }
+            _userNotificationCenterDelegateObserver = PushNotificationDelegateObserverImpl.initWithCallack(
+                new WeakRef(onCallback)
             );
-
-            SharedNotificationDelegate.addObserver(_userNotificationCenterDelegateObserver);
+            UNUserNotificationCenter.currentNotificationCenter().delegate = _userNotificationCenterDelegateObserver;
+            // SharedNotificationDelegate.addObserver(_userNotificationCenterDelegateObserver);
         }
     } else {
         const notificationTypes =
@@ -513,29 +515,37 @@ function _addObserver(eventName, callback) {
     );
 }
 
-class PushNotificationDelegateObserverImpl implements DelegateObserver {
-    observerUniqueKey = 'psuh-messaging';
+type PushNotificationCallback = (unnotification: UNNotification, actionIdentifier?: string, inputText?: string) => void;
+class PushNotificationDelegateObserverImpl extends NSObject {
+    public static ObjCProtocols = [UNUserNotificationCenterDelegate];
+    observerUniqueKey = 'push-messaging';
 
-    private callback: (unnotification: UNNotification, actionIdentifier?: string, inputText?: string) => void;
+    public callback: WeakRef<PushNotificationCallback>;
+    // private _owner: WeakRef<Tabs>;
 
-    constructor(callback: (unnotification: UNNotification, actionIdentifier?: string, inputText?: string) => void) {
-        this.callback = callback;
+    public static initWithCallack(callback: WeakRef<PushNotificationCallback>): PushNotificationDelegateObserverImpl {
+        const delegate = PushNotificationDelegateObserverImpl.new() as PushNotificationDelegateObserverImpl;
+        delegate.callback = callback;
+
+        return delegate;
     }
+
+    // constructor(callback: (unnotification: UNNotification, actionIdentifier?: string, inputText?: string) => void) {
+    //     this.callback = callback;
+    // }
 
     public userNotificationCenterWillPresentNotificationWithCompletionHandler(
         center: UNUserNotificationCenter,
         notification: UNNotification,
-        completionHandler: (p1: UNNotificationPresentationOptions) => void,
-        next: () => void
+        completionHandler: (p1: UNNotificationPresentationOptions) => void
     ): void {
         const userInfo = notification.request.content.userInfo;
         const userInfoJSON = toJsObject(userInfo);
         if (!(notification.request.trigger instanceof UNPushNotificationTrigger)) {
             // not a firebase message!
-            next();
+            // next();
             return;
         }
-
         if (
             _showNotificationsWhenInForeground || // Default value, in case we always want to show when in foreground.
             userInfoJSON['showWhenInForeground'] === true || // ...this is for non-FCM...
@@ -549,19 +559,20 @@ class PushNotificationDelegateObserverImpl implements DelegateObserver {
         } else {
             completionHandler(0);
         }
-
-        this.callback(notification);
+        if (this.callback) {
+            this.callback.get()(notification);
+        }
     }
 
     public userNotificationCenterDidReceiveNotificationResponseWithCompletionHandler(
         center: UNUserNotificationCenter,
         response: UNNotificationResponse,
-        completionHandler: () => void,
-        next: () => void
+        completionHandler: () => void
     ): void {
+        
         if (!(response.notification.request.trigger instanceof UNPushNotificationTrigger)) {
             // not a firebase message!
-            next();
+            // next();
             return;
         }
         // let's ignore "dismiss" actions
@@ -570,7 +581,13 @@ class PushNotificationDelegateObserverImpl implements DelegateObserver {
             return;
         }
 
-        this.callback(response.notification, response.actionIdentifier, (response as UNTextInputNotificationResponse).userText);
+        if (this.callback) {
+            this.callback.get()(
+                response.notification,
+                response.actionIdentifier,
+                (response as UNTextInputNotificationResponse).userText
+            );
+        }
         completionHandler();
     }
 }

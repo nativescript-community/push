@@ -30,7 +30,7 @@ export function toJsObject(objCObj) {
         node = [];
         for (i = 0, l = objCObj.count; i < l; i++) {
             key = objCObj.objectAtIndex(i);
-            node.push(this.toJsObject(key));
+            node.push(toJsObject(key));
         }
     } else if (oKeyArr !== undefined) {
         // object
@@ -44,38 +44,38 @@ export function toJsObject(objCObj) {
                 node[key] = null;
                 continue;
             }
-            node[key] = this.getValueForClass(val);
+            node[key] = getValueForClass(val);
         }
     } else {
-        node = this.getValueForClass(objCObj);
+        node = getValueForClass(objCObj);
     }
 
     return node;
 }
 
-// function getValueForClass(val) {
-//     switch (getClass(val)) {
-//         case 'NSArray':
-//         case 'NSMutableArray':
-//             return this.toJsObject(val);
-//         case 'NSDictionary':
-//         case 'NSMutableDictionary':
-//             return this.toJsObject(val);
-//         case 'String':
-//             return String(val);
-//         case 'Boolean':
-//             return val;
-//         case 'Number':
-//         case 'NSDecimalNumber':
-//             return Number(String(val));
-//         case 'Date':
-//             return new Date(val);
-//         default:
-//             console.log(
-//                 "Please report this at https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues: iOS toJsObject is missing a converter for class '" +
-//                     getClass(val) +
-//                     "'. Casting to String as a fallback."
-//             );
-//             return String(val);
-//     }
-// }
+function getValueForClass(val) {
+    switch (getClass(val)) {
+        case 'NSArray':
+        case 'NSMutableArray':
+            return toJsObject(val);
+        case 'NSDictionary':
+        case 'NSMutableDictionary':
+            return toJsObject(val);
+        case 'String':
+            return String(val);
+        case 'Boolean':
+            return val;
+        case 'Number':
+        case 'NSDecimalNumber':
+            return Number(String(val));
+        case 'Date':
+            return new Date(val);
+        default:
+            console.log(
+                "Please report this at https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues: iOS toJsObject is missing a converter for class '" +
+                    getClass(val) +
+                    "'. Casting to String as a fallback."
+            );
+            return String(val);
+    }
+}
