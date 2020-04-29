@@ -250,21 +250,34 @@ public class PushMessagingService extends FirebaseMessagingService {
     if (iconResource != null) {
       builder.setSmallIcon((Integer) iconResource);
     }
-    if (not.getTitle() != null) {
+
+    if (not.getTitleLocalizationKey() != null) {
+      String title = null;
+      try {
+        title = String.format(this.getString(getStringResId(not.getTitleLocalizationKey()), (Object[]) (not.getTitleLocalizationArgs())));
+      } catch(Exception e) {
+        title = not.getTitle();
+      }
+      builder.setContentTitle(title);
+    } else if (not.getTitle() != null) {
       builder.setContentTitle(not.getTitle());
-    } else if (not.getTitleLocalizationKey() != null) {
-      builder.setContentTitle(String.format(
-          this.getString(getStringResId(not.getTitleLocalizationKey()), (Object[]) (not.getTitleLocalizationArgs()))));
     }
-    if (not.getBody() != null) {
+
+    if (not.getBodyLocalizationKey() != null) {
+      String body = null;
+      try {
+        body = String.format(this.getString(getStringResId(not.getBodyLocalizationKey()), (Object[]) (not.getBodyLocalizationArgs())));
+      } catch(Exception e) {
+        body = not.getBody();
+      }
+      builder.setContentText(body);
+    } else if (not.getBody() != null) {
       builder.setContentText(not.getBody());
-    } else if (not.getTitleLocalizationKey() != null) {
-      builder.setContentText(String.format(
-          this.getString(getStringResId(not.getBodyLocalizationKey()), (Object[]) (not.getBodyLocalizationArgs()))));
-    }
+    }  
     if (color != null) {
       builder.setColor((Integer) color);
     }
+    
     if (not.getSound() != null) {
       builder.setSound(Uri.parse(not.getSound()));
     }
