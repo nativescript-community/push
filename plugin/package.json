@@ -1,6 +1,6 @@
 {
     "name": "nativescript-push",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "Nativescript label implementation supporting HTML",
     "main": "./messaging",
     "typings": "./messaging.d.ts",

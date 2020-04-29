@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.9](https://github.com/farfromrefug/nativescript-push/compare/v1.0.8...v1.0.9) (2020-04-29)
+
+
+### Bug Fixes
+
+* **android:** crash when loc key not known ([1173fad](https://github.com/farfromrefug/nativescript-push/commit/1173fadae2c62a700fc9c4ddab2dd8e6fc84b8ac))
+
+
+
+
+
 ## [1.0.8](https://github.com/farfromrefug/nativescript-push/compare/v1.0.7...v1.0.8) (2020-04-28)
 
 **Note:** Version bump only for package nativescript-push
