@@ -71,11 +71,6 @@ function getValueForClass(val) {
         case 'Date':
             return new Date(val);
         default:
-            console.log(
-                "Please report this at https://github.com/EddyVerbruggen/nativescript-plugin-firebase/issues: iOS toJsObject is missing a converter for class '" +
-                    getClass(val) +
-                    "'. Casting to String as a fallback."
-            );
             return String(val);
     }
 }

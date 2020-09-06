@@ -1,4 +1,4 @@
-import * as application from '@nativescript/core/application';
+import { android as androidApp, launchEvent, on } from '@nativescript/core/application';
 import { MessagingOptions, PushNotificationModel } from './messaging';
 
 declare const com;
@@ -49,16 +49,16 @@ async function initPushMessaging(options?: MessagingOptions) {
     }
 }
 export function init() {
-    if (!application.android.context) {
+    if (!androidApp.context) {
         // throw new Error("Don't call this function before your app has started.");
-        application.on(application.launchEvent, onAppModuleLaunchEvent);
+        on(launchEvent, onAppModuleLaunchEvent);
     } else {
         onAppModuleLaunchEvent();
     }
 }
 
 export function onAppModuleLaunchEvent() {
-    com.nativescript.push.PushMessagingLifecycleCallbacks.registerCallbacks(application.android.nativeApp);
+    com.nativescript.push.PushMessagingLifecycleCallbacks.registerCallbacks(androidApp.nativeApp);
 }
 
 export function onAppModuleResumeEvent(args: any) {
@@ -274,5 +274,5 @@ export function unsubscribeFromTopic(topicName) {
 }
 
 export function areNotificationsEnabled() {
-    return androidx.core.app.NotificationManagerCompat.from(application.android.context).areNotificationsEnabled();
+    return androidx.core.app.NotificationManagerCompat.from(androidApp.context).areNotificationsEnabled();
 }

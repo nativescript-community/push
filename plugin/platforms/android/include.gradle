@@ -1,6 +1,6 @@
 
 dependencies {
-	def firebaseMessagingVersion =  project.hasProperty("firebaseMessagingVersion") ? project.firebaseMessagingVersion : "19.0.1"
+	def firebaseMessagingVersion =  project.hasProperty("firebaseMessagingVersion") ? project.firebaseMessagingVersion : "20.1.0"
 	def androidXCoreVersion =  project.hasProperty("androidXCoreVersion") ? project.androidXCoreVersion : "1.2.0"
 
 	// for reading google-services.json and configuration

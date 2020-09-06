@@ -1,7 +1,5 @@
-import { DelegateObserver, SharedNotificationDelegate } from 'nativescript-shared-notification-delegate';
-import * as applicationSettings from '@nativescript/core/application-settings';
-import * as application from '@nativescript/core/application/application';
-import { device } from '@nativescript/core/platform/platform';
+import { ios as iosApp, launchEvent, on } from '@nativescript/core/application';
+import { Device } from '@nativescript/core';
 import {
     IosInteractiveNotificationAction,
     IosInteractiveNotificationCategory,
@@ -154,13 +152,15 @@ function addOnPushTokenReceivedCallback(callback) {
 // This breaks in-app-messaging :(
 function getAppDelegate() {
     // Play nice with other plugins by not completely ignoring anything already added to the appdelegate
-    if (application.ios.delegate === undefined) {
-        @ObjCClass(UIApplicationDelegate)
-        class UIApplicationDelegateImpl extends UIResponder implements UIApplicationDelegate {}
+    if (iosApp.delegate === undefined) {
+        @NativeClass
+        class UIApplicationDelegateImpl extends UIResponder implements UIApplicationDelegate {
+            public static ObjCProtocols = [UIApplicationDelegate];
+        }
 
-        application.ios.delegate = UIApplicationDelegateImpl;
+        iosApp.delegate = UIApplicationDelegateImpl;
     }
-    return application.ios.delegate;
+    return iosApp.delegate;
 }
 function addAppDelegateMethods(appDelegate) {
     // we need the launchOptions for this one so it's a bit hard to use the UIApplicationDidFinishLaunchingNotification pattern we're using for other things
@@ -396,7 +396,7 @@ function onCallback(unnotification, actionIdentifier?, inputText?) {
 function _registerForRemoteNotifications(resolve?, reject?) {
     let app = UIApplication.sharedApplication;
     if (!app) {
-        application.on('launch', () => _registerForRemoteNotifications(resolve, reject));
+        on(launchEvent, () => _registerForRemoteNotifications(resolve, reject));
         return;
     }
     function actualRegisterForRemoteNotifications() {
@@ -415,7 +415,7 @@ function _registerForRemoteNotifications(resolve?, reject?) {
     _resolveWhenDidRegisterForNotifications = resolve;
     _rejectWhenDidFailToRegisterForNotifications = reject;
 
-    if (parseInt(device.osVersion, 10) >= 10) {
+    if (parseInt(Device.osVersion, 10) >= 10) {
         const authorizationOptions = UNAuthorizationOptions.Alert | UNAuthorizationOptions.Sound | UNAuthorizationOptions.Badge;
         UNUserNotificationCenter.currentNotificationCenter().requestAuthorizationWithOptionsCompletionHandler(
             authorizationOptions,
@@ -469,7 +469,7 @@ function _addOnNotificationActionTakenCallback(callback: Function) {
 function _processPendingNotifications() {
     const app = UIApplication.sharedApplication;
     if (!app) {
-        application.on('launch', () => _processPendingNotifications());
+        on(launchEvent, () => _processPendingNotifications());
         return;
     }
     if (_receivedNotificationCallback) {
@@ -487,7 +487,7 @@ function _processPendingNotifications() {
 function _processPendingActionTakenNotifications() {
     const app = UIApplication.sharedApplication;
     if (!app) {
-        application.on('launch', () => _processPendingNotifications());
+        on(launchEvent, () => _processPendingNotifications());
         return;
     }
     if (_notificationActionTakenCallback) {
@@ -580,7 +580,7 @@ class PushNotificationDelegateObserverImpl extends NSObject {
             this.callback.get()(
                 response.notification,
                 response.actionIdentifier,
-                (response as UNTextInputNotificationResponse).userText
+                (response as any).userText
             );
         }
         completionHandler();

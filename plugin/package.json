@@ -1,5 +1,5 @@
 {
-    "name": "nativescript-push",
+    "name": "@nativescript-community/push",
     "version": "1.0.9",
     "description": "Nativescript label implementation supporting HTML",
     "main": "./messaging",
@@ -18,8 +18,7 @@
         ]
     },
     "dependencies": {
-        "nativescript-hook": "~0.2.5",
-        "nativescript-shared-notification-delegate": "^1.0.0"
+        "nativescript-hook": "~0.2.5"
     },
     "scripts": {
         "preuninstall": "node preuninstall.js",
@@ -36,9 +35,9 @@
         "email": "martin@akylas.fr"
     },
     "bugs": {
-        "url": "https://github.com/farfromrefug/nativescript-push/issues"
+        "url": "https://github.com/nativescript-community/push/issues"
     },
     "license": "Apache-2.0",
-    "homepage": "https://github.com/farfromrefug/nativescript-push",
+    "homepage": "https://github.com/nativescript-community/push",
     "readmeFilename": "README.md"
 }

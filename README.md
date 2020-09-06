@@ -63,7 +63,7 @@ On both iOS and Android the user can disable notifications for your app.
 If you want to check the current state of this setting, you can do:
 
 ```typescript
-import { messaging, Message } from "nativescript-push";
+import { messaging, Message } from "@nativescript-community/push";
 
 console.log(`Notifications enabled? ${messaging.areNotificationsEnabled()}`);
 ```
@@ -72,7 +72,7 @@ console.log(`Notifications enabled? ${messaging.areNotificationsEnabled()}`);
 The easiest way to register for (receiving) push notifications is calling `registerForPushNotifications`, and passing in a few handlers:
 
 ```typescript
-import { messaging, Message } from "nativescript-push";
+import { messaging, Message } from "@nativescript-community/push";
 
 messaging.registerForPushNotifications({
   onPushTokenReceivedCallback: (token: string): void => {
@@ -100,7 +100,7 @@ messaging.registerForPushNotifications({
 If - for some reason - you need to manually retrieve the current push registration token of the device, you can do:
 
 ```typescript
-import { messaging } from "nativescript-push";
+import { messaging } from "@nativescript-community/push";
 
 messaging.getCurrentPushToken()
     .then(token => console.log(`Current push token: ${token}`));
@@ -121,7 +121,7 @@ They then type their reply, and (because of how the action was configured) the a
 <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive01.png" height="270px" alt="Interactive Notification, part 1"/> <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive02.png" height="270px" alt="Interactive Notification, part 2"/> <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive03.png" height="270px" alt="Interactive Notification, part 3"/> <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive04.png" height="270px" alt="Interactive Notification, part 4"/>
 
 ```typescript
-import { messaging, Message } from "nativescript-push";
+import { messaging, Message } from "@nativescript-community/push";
 
 const model = new messaging.PushNotificationModel();
 model.iosSettings = new messaging.IosPushSettings();
