@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/farfromrefug/nativescript-push/compare/v1.0.9...v1.1.0) (2020-09-06)
+
+
+### Features
+
+* N7 and new plugin name ([273fa14](https://github.com/farfromrefug/nativescript-push/commit/273fa142350595fe2aac06059babaa011b626579))
+
+
+
+
+
 ## [1.0.9](https://github.com/nativescript-community/push/compare/v1.0.8...v1.0.9) (2020-04-29)
 
 
