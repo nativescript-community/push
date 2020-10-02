@@ -8,10 +8,7 @@
         "noLib": false,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
-        "lib": [
-            "es6",
-            "dom"
-        ],
+        "lib": ["es6", "dom"],
         "sourceMap": true,
         "pretty": true,
         "allowUnreachableCode": false,
@@ -26,24 +23,14 @@
         "outDir": "./plugin",
         "rootDir": "src",
         "paths": {
-            "*": [
-                "./node_modules/@nativescript/core/*",
-                "./node_modules/*"
-            ]
+            "*": ["./node_modules/@nativescript/core/*", "./node_modules/*"]
         },
         "plugins": [
-          { "transform": "./node_modules/@nativescript/webpack/transformers/ns-transform-native-classes", "type": "raw" }
+            { "transform": "./node_modules/@nativescript/webpack/transformers/ns-transform-native-classes", "type": "raw" }
         ]
     },
-    "include": [
-        "src/**/*.ts",
-        "references.d.ts",
-        "src/references.d.ts"
-    ],
-    "exclude": [
-        "node_modules",
-        ".git",
-        "dist"
-    ],
+    "include": ["src/**/*.ts", "references.d.ts", "src/references.d.ts"],
+    "exclude": ["node_modules", "src/angular", "src/hooks"],
+
     "compileOnSave": false
 }
