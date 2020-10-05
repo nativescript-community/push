@@ -1,7 +1,7 @@
 ﻿
-[npm-image]:http://img.shields.io/npm/v/nativescript-appurl.svg
-[npm-url]:https://npmjs.org/package/nativescript-appurl
-[downloads-image]:http://img.shields.io/npm/dm/nativescript-appurl.svg
+[npm-image]:http://img.shields.io/npm/v/@nativescript-community/push.svg
+[npm-url]:https://npmjs.org/package/@nativescript-community/push
+[downloads-image]:http://img.shields.io/npm/dm/@nativescript-community/push.svg
 
 This plugin is an "extract" of the messaging part of [nativescript-plugin-firebase](https://github.com/EddyVerbruggen/nativescript-plugin-firebase)
 It is only for people wanting to use firebase as less as possible ! No firebase on iOS!!!
