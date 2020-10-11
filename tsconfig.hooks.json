@@ -5,6 +5,6 @@
         "module": "commonjs",
         "moduleResolution": "node"
     },
-    "include": ["src/hooks/**/*.ts", "src/references.d.ts"],
+    "include": ["src/scripts/**/*.ts", "src/references.d.ts"],
     "exclude": ["node_modules"]
 }

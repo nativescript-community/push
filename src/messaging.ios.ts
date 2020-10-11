@@ -516,6 +516,8 @@ function _addObserver(eventName, callback) {
 }
 
 type PushNotificationCallback = (unnotification: UNNotification, actionIdentifier?: string, inputText?: string) => void;
+
+@NativeClass
 class PushNotificationDelegateObserverImpl extends NSObject {
     public static ObjCProtocols = [UNUserNotificationCenterDelegate];
     observerUniqueKey = 'push-messaging';

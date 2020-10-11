@@ -30,7 +30,7 @@
         ]
     },
     "include": ["src/**/*.ts", "references.d.ts", "src/references.d.ts"],
-    "exclude": ["node_modules", "src/angular", "src/hooks"],
+    "exclude": ["node_modules", "src/angular", "src/scripts"],
 
     "compileOnSave": false
 }
