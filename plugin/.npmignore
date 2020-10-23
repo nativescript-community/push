@@ -5,5 +5,6 @@ src/
 *.ts
 *.map
 *.old
+*.aar
 tsconfig.json
 !*.d.ts
