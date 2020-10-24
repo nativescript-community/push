@@ -61,10 +61,18 @@ module.exports = function ($logger, $projectData, hookArgs) {
                 fs.writeFileSync(destinationGoogleJsonAlt, fs.readFileSync(sourceGoogleJson));
                 resolve();
             } else {
-                $logger.warn(
-                    'Unable to copy google-services.json. You need this file, because the Google Services Plugin cannot function without it..'
-                );
-                reject();
+
+                if (isProdEnv) {
+                    $logger.error(
+                        'Unable to copy google-services.json. You need this file, because the Google Services Plugin cannot function without it..'
+                    );
+                    reject();
+                } else {
+                    $logger.warn(
+                        'Unable to copy google-services.json. You need this file, because the Google Services Plugin cannot function without it..'
+                    );
+                    resolve();
+                }
             }
         } else if (platform === 'ios') {
             // we have copied our GoogleService-Info.plist during before-checkForChanges hook, here we delete it to avoid changes in git
