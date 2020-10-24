@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.5](https://github.com/farfromrefug/nativescript-push/compare/v1.1.4...v1.1.5) (2020-10-24)
+
+
+### Bug Fixes
+
+* hook wont fail in go google-services.json in dev ([61d7c93](https://github.com/farfromrefug/nativescript-push/commit/61d7c934651f294e2a212a857a0c74672421eb0b))
+
+
+
+
+
 ## [1.1.4](https://github.com/farfromrefug/nativescript-push/compare/v1.1.3...v1.1.4) (2020-10-23)
 
 **Note:** Version bump only for package @nativescript-community/push
