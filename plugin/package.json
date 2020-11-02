@@ -4,6 +4,7 @@
     "description": "Very simple push notification plugin",
     "main": "./messaging",
     "typings": "./messaging.d.ts",
+    "sideEffects": false,
     "nativescript": {
         "platforms": {
             "android": "5.0.0",
