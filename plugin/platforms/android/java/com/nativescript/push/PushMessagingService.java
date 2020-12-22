@@ -19,10 +19,6 @@ import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -57,29 +53,6 @@ public class PushMessagingService extends FirebaseMessagingService {
     // manage this apps subscriptions on the server side, send the
     // Instance ID token to your app server.
   }
-
-  /**
-   * 
-   * /* private void sendNotification(String messageBody) { Intent intent = new
-   * Intent(this, MainActivity.class);
-   * intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP); PendingIntent pendingIntent
-   * = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-   * 
-   * Uri defaultSoundUri=
-   * RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-   * NotificationCompat.Builder notificationBuilder = new
-   * NotificationCompat.Builder(this)
-   * .setSmallIcon(R.drawable.ic_stat_ic_notification) .setContentTitle("FCM
-   * Message") .setContentText(messageBody) .setAutoCancel(true)
-   * .setSound(defaultSoundUri) .setContentIntent(pendingIntent);
-   * 
-   * NotificationManager notificationManager = (NotificationManager)
-   * getSystemService(Context.NOTIFICATION_SERVICE);
-   * 
-   * // 0 = id of notification notificationManager.notify(0,
-   * notificationBuilder.build()); }
-   */
-
   public static void registerForPushNotifications(final PushMessagingServiceListener callback) {
 
     // new Thread() {
@@ -93,47 +66,9 @@ public class PushMessagingService extends FirebaseMessagingService {
         } else {
           final String token = task.getResult().getToken();
           callback.success(token);
-          // dont call executeOnPushTokenReceivedCallback as it will be called onNewToken
-          // executeOnPushTokenReceivedCallback(token);
         }
       }
     });
-    // // try {
-
-    // FirebaseInstanceId.getInstance().getInstanceId()
-    // .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
-    // @Override
-    // public void onComplete(Task<InstanceIdResult> task) {
-    // if (!task.isSuccessful()) {
-
-    // Log.d(TAG, "getInstanceId failed " + task.getException());
-    // return;
-    // }
-
-    // // Get new Instance ID token
-    // String token = task.getResult().getToken();
-
-    // if (!preventInitialRegisterTokenCallback) {
-    // executeOnPushTokenReceivedCallback(token);
-    // }
-
-    // preventInitialRegisterTokenCallback = false;
-    // // TODO register token to your server.
-
-    // }
-    // });
-    // // String token = FirebaseInstanceId.getInstance().getToken(senderId, "FCM");
-
-    // // if (!preventInitialRegisterTokenCallback) {
-    // // executeOnPushTokenReceivedCallback(token);
-    // // }
-
-    // // preventInitialRegisterTokenCallback = false;
-    // // } catch (IOException e) {
-    // // Log.e(TAG, "Error getting a token from FCM: " + e.getMessage(), e);
-    // // }
-    // }
-    // }.start();
   }
 
   public static String getCurrentPushToken() {
@@ -162,7 +97,6 @@ public class PushMessagingService extends FirebaseMessagingService {
     onPushTokenReceivedCallback = callbacks;
     if (currentToken != null) {
       executeOnPushTokenReceivedCallback(currentToken);
-      // preventInitialRegisterTokenCallback = true;
     }
   }
 
@@ -203,24 +137,24 @@ public class PushMessagingService extends FirebaseMessagingService {
 
   public void showNotification(final RemoteMessage.Notification not) {
     Object color = not.getColor();
-    Log.d(TAG, "Message Notification Body: " + not.getBody());
-    Log.d(TAG, "Message Notification BodyLocalize: " + not.getBodyLocalizationKey());
-    Log.d(TAG, "Message Notification BodyLocalizeArgs: " + not.getBodyLocalizationArgs());
-    Log.d(TAG, "Message Notification Title: " + not.getTitle());
-    Log.d(TAG, "Message Notification TitleLocalize: " + not.getTitleLocalizationKey());
-    Log.d(TAG, "Message Notification TitleLocalizeArgs: " + not.getTitleLocalizationArgs());
-    Log.d(TAG, "Message Notification getChannelId: " + not.getChannelId());
-    Log.d(TAG, "Message Notification getColor: " + not.getColor());
-    Log.d(TAG, "Message Notification getIcon: " + not.getIcon());
-    Log.d(TAG, "Message Notification getSound: " + not.getSound());
-    Log.d(TAG, "Message Notification getTag: " + not.getTag());
-    Log.d(TAG, "Message Notification getTicker: " + not.getTicker());
-    Log.d(TAG, "Message Notification getEventTime: " + not.getEventTime());
-    Log.d(TAG, "Message Notification getVisibility: " + not.getVisibility());
-    Log.d(TAG, "Message Notification getImageUrl: " + not.getImageUrl());
-    Log.d(TAG, "Message Notification getSticky: " + not.getSticky());
-    Log.d(TAG, "Message Notification getLightSettings: " + not.getLightSettings());
-    Log.d(TAG, "Message Notification getVibrateTimings: " + not.getVibrateTimings());
+    // Log.d(TAG, "Message Notification Body: " + not.getBody());
+    // Log.d(TAG, "Message Notification BodyLocalize: " + not.getBodyLocalizationKey());
+    // Log.d(TAG, "Message Notification BodyLocalizeArgs: " + not.getBodyLocalizationArgs());
+    // Log.d(TAG, "Message Notification Title: " + not.getTitle());
+    // Log.d(TAG, "Message Notification TitleLocalize: " + not.getTitleLocalizationKey());
+    // Log.d(TAG, "Message Notification TitleLocalizeArgs: " + not.getTitleLocalizationArgs());
+    // Log.d(TAG, "Message Notification getChannelId: " + not.getChannelId());
+    // Log.d(TAG, "Message Notification getColor: " + not.getColor());
+    // Log.d(TAG, "Message Notification getIcon: " + not.getIcon());
+    // Log.d(TAG, "Message Notification getSound: " + not.getSound());
+    // Log.d(TAG, "Message Notification getTag: " + not.getTag());
+    // Log.d(TAG, "Message Notification getTicker: " + not.getTicker());
+    // Log.d(TAG, "Message Notification getEventTime: " + not.getEventTime());
+    // Log.d(TAG, "Message Notification getVisibility: " + not.getVisibility());
+    // Log.d(TAG, "Message Notification getImageUrl: " + not.getImageUrl());
+    // Log.d(TAG, "Message Notification getSticky: " + not.getSticky());
+    // Log.d(TAG, "Message Notification getLightSettings: " + not.getLightSettings());
+    // Log.d(TAG, "Message Notification getVibrateTimings: " + not.getVibrateTimings());
     final String packageName = this.getPackageName();
     android.content.pm.ApplicationInfo app;
     Object iconResource = null;
@@ -289,11 +223,11 @@ public class PushMessagingService extends FirebaseMessagingService {
   public void onMessageReceived(RemoteMessage remoteMessage) {
     try {
       final JSONObject json = new JSONObject().put("foreground", isActive).put("from", remoteMessage.getFrom());
-      Log.d(TAG, "onMessageReceived: " + remoteMessage.getMessageId() + ", " + remoteMessage.getFrom() + ", "
-          + remoteMessage.getCollapseKey() + ", " + remoteMessage.getTo() + ", " + remoteMessage.getData());
+      // Log.d(TAG, "onMessageReceived: " + remoteMessage.getMessageId() + ", " + remoteMessage.getFrom() + ", "
+          // + remoteMessage.getCollapseKey() + ", " + remoteMessage.getTo() + ", " + remoteMessage.getData());
 
       final RemoteMessage.Notification not = remoteMessage.getNotification();
-      Log.d(TAG, "not: " + not);
+      // Log.d(TAG, "not: " + not);
 
       if (not != null && showNotificationsWhenInForeground && isActive) {
         showNotification(not);
