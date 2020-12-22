@@ -4,40 +4,13 @@ import { MessagingOptions, PushNotificationModel } from './messaging';
 declare const com;
 
 let _launchNotification = null;
-// let _senderId: string = null;
 
-// function getSenderId(): Promise<string> {
-//     return new Promise((resolve, reject) => {
-//         if (_senderId !== null) {
-//             resolve(_senderId);
-//         }
-
-//         const setSenderIdAndResolve = () => {
-//             const senderIdResourceId = application.android.context
-//                 .getResources()
-//                 .getIdentifier('gcm_defaultSenderId', 'string', application.android.context.getPackageName());
-//             if (senderIdResourceId === 0) {
-//                 throw new Error(
-//                     "####################### Seems like you did not include 'google-services.json' in your project! Firebase Messaging will not work properly. #######################"
-//                 );
-//             }
-//             _senderId = application.android.context.getString(senderIdResourceId);
-//             resolve(_senderId);
-//         };
-
-//         if (!application.android.context) {
-//             // throw new Error("Don't call this function before your app has started.");
-//             application.on(application.launchEvent, () => setSenderIdAndResolve());
-//         } else {
-//             setSenderIdAndResolve();
-//         }
-//     });
-// }
-
+let initialized = false;
 async function initPushMessaging(options?: MessagingOptions) {
-    if (!options) {
+    if (!options || initialized) {
         return;
     }
+    initialized = true;
     if (options.showNotificationsWhenInForeground !== undefined) {
         com.nativescript.push.PushMessagingService.showNotificationsWhenInForeground = options.showNotificationsWhenInForeground;
     }
@@ -111,7 +84,7 @@ export function getCurrentPushToken(): Promise<string> {
 
 let _receivedNotificationCallback;
 function addOnMessageReceivedCallback(callback) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             _receivedNotificationCallback = callback;
 
@@ -137,7 +110,7 @@ function addOnMessageReceivedCallback(callback) {
 }
 
 function addOnPushTokenReceivedCallback(callback) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             let tokenReturned = false;
             com.nativescript.push.PushMessagingService.setOnPushTokenReceivedCallback(
@@ -220,7 +193,7 @@ export function unregisterForPushNotifications(): Promise<void> {
 }
 
 export function subscribeToTopic(topicName) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             const onCompleteListener = new com.google.android.gms.tasks.OnCompleteListener({
                 onComplete: (task) => {
@@ -247,7 +220,7 @@ export function subscribeToTopic(topicName) {
 }
 
 export function unsubscribeFromTopic(topicName) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             const onCompleteListener = new com.google.android.gms.tasks.OnCompleteListener({
                 onComplete: (task) => {

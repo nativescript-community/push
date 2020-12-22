@@ -28,10 +28,12 @@ let _rejectWhenDidFailToRegisterForNotifications;
 // This way we can suppress the "Allow notifications" consent popup until the listeners are passed in.
 // const NOTIFICATIONS_REGISTRATION_KEY = 'Push-RegisterForRemoteNotifications';
 
-export function initPushMessaging(options) {
-    if (!options) {
+let initialized = false;
+async function initPushMessaging(options?: MessagingOptions) {
+    if (!options || initialized) {
         return;
     }
+    initialized = true;
     _showNotifications = options.showNotifications === undefined ? _showNotifications : !!options.showNotifications;
     _showNotificationsWhenInForeground =
         options.showNotificationsWhenInForeground === undefined
@@ -49,7 +51,7 @@ export function initPushMessaging(options) {
 }
 
 export function addOnMessageReceivedCallback(callback: Function) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             // applicationSettings.setBoolean(NOTIFICATIONS_REGISTRATION_KEY, true);
 
@@ -129,7 +131,7 @@ export function handleRemoteNotification(app, userInfo) {
 }
 
 function addOnPushTokenReceivedCallback(callback) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             _receivedPushTokenCallback = callback;
             // may already be present
@@ -454,7 +456,7 @@ function _registerForRemoteNotifications(resolve?, reject?) {
 }
 
 function _addOnNotificationActionTakenCallback(callback: Function) {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
         try {
             _notificationActionTakenCallback = callback;
             _processPendingActionTakenNotifications();
