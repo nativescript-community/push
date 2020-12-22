@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 module.exports = function ($logger, $projectData, hookArgs) {
-    return new Promise(function (resolve, reject) {
+    return new Promise<void>(function (resolve, reject) {
         /* Decide whether to prepare for dev or prod environment */
         const validStagingEnvs = ['dev', 'development', 'staging'];
         const validProdEnvs = ['prod', 'production'];
