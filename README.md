@@ -26,7 +26,7 @@ Open /platforms/ios/yourproject.__xcworkspace__ (!) and go to your project's tar
 
 #### Copy the entitlements file
 The previous step created a the file`platforms/ios/YourAppName/(Resources/)YourAppName.entitlements`.
-Copy that file to `app/App_Resources/iOS/` (if it doesn't exist yet, otherwise merge its contents),
+Copy that file to `app/App_Resources/iOS/app.entitlements` (if it doesn't exist yet, otherwise merge its contents),
 so it's not removed when you remove and re-add the iOS platform. The relevant content for background push in that file is:
 
 ```xml
@@ -34,7 +34,7 @@ so it's not removed when you remove and re-add the iOS platform. The relevant co
 	<string>development</string>
 ```
 
-> Note that the filename can either be `<YourAppName>.entitlements` or `app.entitlements`, where `YourAppName` is the iOS foldername, see the path above.
+> Note that the filename should be `app.entitlements`, see the path above.
 
 #### Configure push notifications in `Info.plist`
 Tell the plugin to allow an external push provider by adding this to `App_Resources/iOS/Info.plist` (without this, the push token will always be `undefined`!):
@@ -58,12 +58,20 @@ The end result should look like [this](https://github.com/EddyVerbruggen/natives
 #### 
 ## API
 
+### `init`
+In your main application JS file, you must call `init()`.
+
+```typescript
+import * as messaging from '@nativescript-community/push';
+messaging.init();
+```
+
 ### `areNotificationsEnabled`
 On both iOS and Android the user can disable notifications for your app.
 If you want to check the current state of this setting, you can do:
 
 ```typescript
-import { messaging, Message } from "@nativescript-community/push";
+import * as messaging from "@nativescript-community/push";
 
 console.log(`Notifications enabled? ${messaging.areNotificationsEnabled()}`);
 ```
@@ -72,15 +80,15 @@ console.log(`Notifications enabled? ${messaging.areNotificationsEnabled()}`);
 The easiest way to register for (receiving) push notifications is calling `registerForPushNotifications`, and passing in a few handlers:
 
 ```typescript
-import { messaging, Message } from "@nativescript-community/push";
+import * as messaging from "@nativescript-community/push";
 
 messaging.registerForPushNotifications({
   onPushTokenReceivedCallback: (token: string): void => {
     console.log("Firebase plugin received a push token: " + token);
   },
 
-  onMessageReceivedCallback: (message: Message) => {
-    console.log("Push message received: " + message.title);
+  onMessageReceivedCallback: (message: messaging.Message) => {
+    console.log("Push message received:", message));
   },
 
   // Whether you want this plugin to automatically display the notifications or just notify the callback. Currently used on iOS only. Default true.
@@ -100,7 +108,7 @@ messaging.registerForPushNotifications({
 If - for some reason - you need to manually retrieve the current push registration token of the device, you can do:
 
 ```typescript
-import { messaging } from "@nativescript-community/push";
+import * as messaging from "@nativescript-community/push";
 
 messaging.getCurrentPushToken()
     .then(token => console.log(`Current push token: ${token}`));
@@ -121,7 +129,7 @@ They then type their reply, and (because of how the action was configured) the a
 <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive01.png" height="270px" alt="Interactive Notification, part 1"/> <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive02.png" height="270px" alt="Interactive Notification, part 2"/> <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive03.png" height="270px" alt="Interactive Notification, part 3"/> <img src="https://raw.githubusercontent.com/EddyVerbruggen/nativescript-plugin-firebase/master/docs/images/messaging/interactive04.png" height="270px" alt="Interactive Notification, part 4"/>
 
 ```typescript
-import { messaging, Message } from "@nativescript-community/push";
+import * as messaging from "@nativescript-community/push";
 
 const model = new messaging.PushNotificationModel();
 model.iosSettings = new messaging.IosPushSettings();
@@ -166,7 +174,7 @@ model.iosSettings.interactiveSettings.categories = [{
   identifier: "GENERAL"
 }];
 
-model.onNotificationActionTakenCallback = (actionIdentifier: string, message: Message) => {
+model.onNotificationActionTakenCallback = (actionIdentifier: string, message: messaging.Message) => {
   console.log(`onNotificationActionTakenCallback fired! Message: ${JSON.stringify(message)}, Action taken: ${actionIdentifier}`);
 };
 
