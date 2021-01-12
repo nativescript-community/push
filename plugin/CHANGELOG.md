@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.8](https://github.com/farfromrefug/nativescript-push/compare/v1.1.7...v1.1.8) (2021-01-12)
+
+
+### Bug Fixes
+
+* **android:** fix for onNewToken not being called ([404e387](https://github.com/farfromrefug/nativescript-push/commit/404e387db0ee290960f8f8aeddee3f3119f73836))
+
+
+
+
+
 ## [1.1.7](https://github.com/farfromrefug/nativescript-push/compare/v1.1.6...v1.1.7) (2020-12-22)
 
 
