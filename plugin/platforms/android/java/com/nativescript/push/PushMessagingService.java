@@ -65,6 +65,7 @@ public class PushMessagingService extends FirebaseMessagingService {
           callback.error(task.getException());
         } else {
           final String token = task.getResult().getToken();
+          executeOnPushTokenReceivedCallback(token);
           callback.success(token);
         }
       }
