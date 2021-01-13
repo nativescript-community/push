@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.9](https://github.com/farfromrefug/nativescript-push/compare/v1.1.8...v1.1.9) (2021-01-13)
+
+
+### Bug Fixes
+
+* **android:** bring back resume event to get message on notif tap ([f67bc7e](https://github.com/farfromrefug/nativescript-push/commit/f67bc7ed330ae850f21e3f2b21c45ac647083c07))
+* **ios:** prevent duplicate callbacks ([d2cd302](https://github.com/farfromrefug/nativescript-push/commit/d2cd30269a0ca93c5aeb74656ef6fc1700649c68))
+
+
+
+
+
 ## [1.1.8](https://github.com/farfromrefug/nativescript-push/compare/v1.1.7...v1.1.8) (2021-01-12)
 
 
