@@ -28,12 +28,12 @@ let _rejectWhenDidFailToRegisterForNotifications;
 // This way we can suppress the "Allow notifications" consent popup until the listeners are passed in.
 // const NOTIFICATIONS_REGISTRATION_KEY = 'Push-RegisterForRemoteNotifications';
 
-let initialized = false;
+let initPushMessagingDone = false;
 async function initPushMessaging(options?: MessagingOptions) {
-    if (!options || initialized) {
+    if (!options || initPushMessagingDone) {
         return;
     }
-    initialized = true;
+    initPushMessagingDone = true;
     _showNotifications = options.showNotifications === undefined ? _showNotifications : !!options.showNotifications;
     _showNotificationsWhenInForeground =
         options.showNotificationsWhenInForeground === undefined
@@ -233,12 +233,17 @@ function addBackgroundRemoteNotificationHandler(appDelegate) {
     };
 }
 
+
+let initialized = false;
 export function init() {
+    if (initialized) {
+        return;
+    }
+    initialized = true;
     prepAppDelegate();
     const delegate = getAppDelegate();
     addAppDelegateMethods(delegate);
     addBackgroundRemoteNotificationHandler(delegate);
-    // initPushMessaging(arg);
 }
 
 export function registerForInteractivePush(model?: PushNotificationModel): void {
