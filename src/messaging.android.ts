@@ -1,16 +1,16 @@
-import { android as androidApp, launchEvent, on } from '@nativescript/core/application';
+import { android as androidApp, launchEvent, on, resumeEvent } from '@nativescript/core/application';
 import { MessagingOptions, PushNotificationModel } from './messaging';
 
 declare const com;
 
 let _launchNotification = null;
 
-let initialized = false;
+let initPushMessagingDone = false;
 async function initPushMessaging(options?: MessagingOptions) {
-    if (!options || initialized) {
+    if (!options || initPushMessagingDone) {
         return;
     }
-    initialized = true;
+    initPushMessagingDone = true;
     if (options.showNotificationsWhenInForeground !== undefined) {
         com.nativescript.push.PushMessagingService.showNotificationsWhenInForeground = options.showNotificationsWhenInForeground;
     }
@@ -21,13 +21,18 @@ async function initPushMessaging(options?: MessagingOptions) {
         await addOnPushTokenReceivedCallback(options.onPushTokenReceivedCallback);
     }
 }
+let initialized = false;
 export function init() {
+    if (initialized) {
+        return;
+    }
+    initialized = true;
     if (!androidApp.context) {
-        // throw new Error("Don't call this function before your app has started.");
         on(launchEvent, onAppModuleLaunchEvent);
     } else {
         onAppModuleLaunchEvent();
     }
+    on(resumeEvent, onAppModuleResumeEvent);
 }
 
 export function onAppModuleLaunchEvent() {
