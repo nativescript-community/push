@@ -7,8 +7,6 @@ import java.io.IOException;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
-import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
@@ -58,13 +56,13 @@ public class PushMessagingService extends FirebaseMessagingService {
     // new Thread() {
     // public void run() {
     FirebaseMessaging.getInstance().setAutoInitEnabled(true);
-    FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+    FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
       @Override
-      public void onComplete(Task<InstanceIdResult> task) {
+      public void onComplete(Task<String> task) {
         if (!task.isSuccessful()) {
           callback.error(task.getException());
         } else {
-          final String token = task.getResult().getToken();
+          final String token = task.getResult();
           executeOnPushTokenReceivedCallback(token);
           callback.success(token);
         }
@@ -77,13 +75,17 @@ public class PushMessagingService extends FirebaseMessagingService {
   }
 
   public static void unregisterForPushNotifications() {
-    try {
-      FirebaseMessaging.getInstance().setAutoInitEnabled(false);
-      FirebaseInstanceId.getInstance().deleteInstanceId();
-      currentToken = null;
-    } catch (IOException e) {
-      Log.e(TAG, "Error deleting token in FCM: " + e.getMessage(), e);
-    }
+    FirebaseMessaging.getInstance().setAutoInitEnabled(false);
+    FirebaseMessaging.getInstance().deleteToken().addOnCompleteListener(new OnCompleteListener<Void>() {
+      @Override
+      public void onComplete(Task<Void> task) {
+        if (!task.isSuccessful()) {
+          Log.e(TAG, "Error deleting token in FCM: " + task.getException().getMessage(), task.getException());
+        } 
+      }
+    });
+
+    currentToken = null;
   }
 
   public static void setOnPushTokenReceivedCallback(PushMessagingServiceListener callbacks) {
