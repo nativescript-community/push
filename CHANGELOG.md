@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.10](https://github.com/farfromrefug/nativescript-push/compare/v1.1.9...v1.1.10) (2022-07-19)
+
+
+### Bug Fixes
+
+* Don't use deprecated Firebase iid classes. ([3c21834](https://github.com/farfromrefug/nativescript-push/commit/3c2183408e0f889e49e72d06ab9d63429aeececf))
+
+
+
+
+
 ## [1.1.9](https://github.com/farfromrefug/nativescript-push/compare/v1.1.8...v1.1.9) (2021-01-13)
 
 
