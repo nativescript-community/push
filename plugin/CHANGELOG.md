@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.11](https://github.com/farfromrefug/nativescript-push/compare/v1.1.10...v1.1.11) (2022-09-20)
+
+
+### Bug Fixes
+
+* **android:** prevent error while building ([4d8243a](https://github.com/farfromrefug/nativescript-push/commit/4d8243ae170049af32b9b5ecf95e9c8215389cdb))
+
+
+
+
+
 ## [1.1.10](https://github.com/farfromrefug/nativescript-push/compare/v1.1.9...v1.1.10) (2022-07-19)
 
 
